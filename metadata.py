@@ -1,6 +1,6 @@
 APP_NAME = "Hybrid Management Allocation Framework"
 SHORT_NAME = "HMAF"
 INSTITUTION = "Deakin University"
-DEVELOPER_NAME = "Insert Developer Name"
-RESEARCH_PAPER_TITLE = "Insert Research Paper Title Here"
+DEVELOPER_NAME = "Mr. Jarrad Kyne"
+RESEARCH_PAPER_TITLE = "The effectiveness of digital project management tools compared to physical site presence in construction"
 COPYRIGHT_LINE = "Research-derived construction management decision-support tool"
