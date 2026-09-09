@@ -1,0 +1,6 @@
+APP_NAME = "Hybrid Management Allocation Framework"
+SHORT_NAME = "HMAF"
+INSTITUTION = "Deakin University"
+DEVELOPER_NAME = "Insert Developer Name"
+RESEARCH_PAPER_TITLE = "Insert Research Paper Title Here"
+COPYRIGHT_LINE = "Research-derived construction management decision-support tool"
