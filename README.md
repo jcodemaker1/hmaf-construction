@@ -1,31 +1,25 @@
-# Hybrid Management Allocation Framework (HMAF)
+# HMAF Version 0.02
+Hybrid Management Allocation Framework (HMAF) / Hybrid Management Orientation Score (HMOS).
 
-Research-derived Streamlit decision-support prototype for construction project management.
+## Version 0.02 changes
+- No result before deliberate submission.
+- Automatic research benchmarks from factual context inputs.
+- Concurrent-project workload added.
+- Industry-facing slider questions while academic variable codes remain visible.
+- Digital readiness diagnostic.
+- Physical-presence and AI governance safeguards.
+- Management Allocation Plan.
+- Evidence behind the recommendation.
+- One-step sensitivity analysis.
+- PDF assessment report and raw CSV.
+- Assessment reference and model version.
+- Automated calculation and threshold tests.
 
-## What the tool does
-
-The application calculates a Hybrid Management Orientation Score (HMOS) from:
-- Information suitability (I)
-- Concurrency/scalability requirement (C)
-- Digital-system reliability (D)
-- Risk/consequence (R)
-- Verification/site-context requirement (V)
-- Leadership/relational requirement (L)
-
-Digital-system reliability is itself calculated from device access, site connectivity, information quality/currency, and system integration.
-
-## Core equations
-
-DS = (I + C + D) / 3
-
+## Core formula
 D = (Devices + Connectivity + Information Quality + Integration) / 4
-
+DS = (I + C + D) / 3
 PPN = (R + V + L) / 3
-
 HMOS = 3 + (DS - PPN) / 2
 
-## Important
-
-This is a research-derived decision-support prototype, not a validated predictive equation and not a replacement for legal, contractual, WHS, inspection or professional obligations.
-
-Before public release, confirm naming, attribution, intellectual-property and licensing arrangements with the research supervisor / university as appropriate.
+## Run tests
+python -m unittest discover -s tests -v

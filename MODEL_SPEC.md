@@ -1,30 +1,30 @@
-# HMAF / HMOS Model Specification
+# HMAF / HMOS Model Specification — Version 0.02
 
 ## Purpose
-Operationalise practitioner-grounded findings about the allocation of digital and physical construction-management effort.
+Operationalise practitioner-grounded findings concerning allocation of digital and physical construction-management effort.
 
-## Output scale
-The HMOS is interpreted on the same five-category orientation scale used in the study:
+## Core constructs
+Digital Suitability: I, C, D.
+Physical Presence Need: R, V, L.
 
-- HMOS < 1.5: Mostly physical presence
-- 1.5 <= HMOS < 2.5: Hybrid leaning physical
-- 2.5 <= HMOS < 3.5: Balanced hybrid
-- 3.5 <= HMOS < 4.5: Hybrid leaning digital
-- HMOS >= 4.5: Mostly digital tools
+## Equations
+D = (Devices + Connectivity + Information Quality + Integration) / 4
+DS = (I + C + D) / 3
+PPN = (R + V + L) / 3
+HMOS = 3 + (DS - PPN) / 2
 
-The cut-points are the half-way points between the five original response categories.
+## Categories
+HMOS < 1.5 — Mostly physical presence
+1.5 <= HMOS < 2.5 — Hybrid leaning physical
+2.5 <= HMOS < 3.5 — Balanced hybrid
+3.5 <= HMOS < 4.5 — Hybrid leaning digital
+HMOS >= 4.5 — Mostly digital tools
 
-## Why equal weights
-Equal weights are intentionally used at prototype stage because the study supports the inclusion and direction of the six framework factors but does not estimate validated coefficients for all six inputs.
-
-The exploratory regression coefficient for digital-system reliability is not inserted into the HMOS. That model predicted the digital-effectiveness composite and did not estimate the final digital-versus-physical allocation outcome.
+## Weighting
+Equal weights are retained because the current research does not estimate validated coefficients for all six final allocation inputs. The exploratory regression coefficient for digital reliability predicted perceived digital effectiveness, not the final HMAF allocation outcome, so it is evidence supporting inclusion of D rather than a validated HMOS weight.
 
 ## Safeguards
-The app does not allow the HMOS to silently override strong empirical physical-presence signals. It separately displays:
-- task-specific research presence benchmarks;
-- a high-consequence verification trigger;
-- a digital-readiness warning when D < 3;
-- human-review, accountability and validation checks when AI/automated monitoring is used.
+Task-specific physical-presence evidence, high-consequence verification, low digital readiness, and AI human-review/accountability/validation controls remain separate from the aggregate HMOS.
 
-## Reassessment principle
-HMOS is intended to be recalculated by project stage or management activity. It should not be converted directly into one fixed percentage of onsite attendance.
+## Stage responsiveness
+HMOS should be recalculated when stage, task, risk, workload or digital readiness materially changes. It must not be converted directly to one fixed onsite-attendance percentage.
