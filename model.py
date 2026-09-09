@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, Tuple
 
-MODEL_VERSION = "0.02"
+MODEL_VERSION = "0.03"
 
 @dataclass(frozen=True)
 class HMAFResult:
