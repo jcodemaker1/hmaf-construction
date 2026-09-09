@@ -9,6 +9,9 @@ from reporting import build_pdf
 st.set_page_config(page_title='HMAF | Construction Management Allocation',page_icon='🏗️',layout='wide')
 st.markdown('''<style>
 .block-container{padding-top:2rem;padding-bottom:3rem;max-width:1450px} h1,h2,h3{color:#18324A}.hmaf-eyebrow{color:#147D73;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem}.hmaf-result{border-left:6px solid #147D73;border-radius:8px;padding:14px 18px;background:#F2F8F7}.small-note{color:#667085;font-size:.88rem}
+/* Slider accent fallback. The canonical colour is also set in .streamlit/config.toml. */
+div[data-testid='stSlider'] div[role='slider']{background-color:#147D73 !important;border-color:#147D73 !important;}
+div[data-testid='stSlider'] [data-baseweb='slider']>div>div:first-child{background-color:#147D73 !important;}
 </style>''',unsafe_allow_html=True)
 
 I_ANCHORS={1:'Very low — the activity cannot be accurately understood or progressed through digital information alone.',2:'Low — digital information helps, but substantial direct clarification or observation remains necessary.',3:'Moderate — the activity is partly information-based and partly dependent on site/contextual input.',4:'High — most of the activity can be represented, reviewed and progressed through reliable digital information.',5:'Very high — the activity is strongly information-oriented and can be managed almost entirely through current digital information.'}
@@ -43,48 +46,83 @@ with st.expander('How the HMAF calculation works'):
     st.write('The continuous HMOS remains on the same 1–5 management-orientation continuum used in the underlying study. Equal weighting is intentionally retained at prototype stage because the research does not estimate validated coefficients for all six HMAF factors.')
 
 st.header('1. Define the management situation'); st.write('Enter the conditions that exist **now**. Research benchmarks are selected automatically from your factual inputs.')
-with st.form('hmaf_assessment_form'):
-    c1,c2=st.columns(2)
-    with c1:
-        assessment_name=st.text_input('Assessment name',placeholder='Example: Level 3 concrete pour — Tower A')
-        scope=st.radio('Assessment level',['Current management activity','Current project stage','Whole project — preliminary only'],help='Stage/activity assessment is preferred because the research indicates management requirements change with context.')
-        project_stage=st.selectbox('Current project stage',['Not specified','Pre-construction / design coordination','Mobilisation / site establishment','Structure','Envelope','Services / fit-out','Commissioning','Handover / close-out','Other'])
-    with c2:
-        project_value=st.selectbox('Typical project value',['Not specified','<$5m','$5m–$50m','$50m–$250m','>$250m','Varies / not applicable'])
-        concurrent_projects=st.selectbox('How many projects are you currently managing or coordinating?',['Not specified','1','2–3','4–5','6–8','9+'])
-        activity=st.selectbox('Closest management activity',list(TASK_PRESENCE_EVIDENCE.keys()))
-    if scope=='Whole project — preliminary only': st.warning('Whole-project assessment selected. Treat the resulting HMOS as preliminary and repeat the assessment for important project stages and management activities.')
-    st.header('2. Assess the HMAF factors'); st.caption('The sliders start at the neutral midpoint, but **no HMOS result is produced until you confirm and submit the assessment**.')
-    left,right=st.columns(2)
-    with left:
-        st.subheader('Digital Suitability')
-        I=anchor_slider('How digitally manageable is this activity?  (I — Information suitability)','I',I_ANCHORS,'To what extent can the activity be accurately understood, reviewed and progressed using current digital information?')
-        C=anchor_slider('How strongly does workload require remote management reach?  (C — Concurrency / scalability)','C',C_ANCHORS,'How strongly do concurrent projects, geographic spread or multiple workstreams create a need for digital management reach?')
-        st.markdown('### Digital Environment Reliability (D)'); st.caption('D is calculated from the four digital-readiness conditions measured in the research.')
-        devices=anchor_slider('Suitable devices / access','devices',READY_ANCHORS,'Are suitable devices, access and permissions available?')
-        connectivity=anchor_slider('Site network / connectivity','connectivity',READY_ANCHORS,'Is connectivity dependable enough for the intended digital workflow?')
-        information_quality=anchor_slider('Quality and currency of project information','information_quality',READY_ANCHORS,'Is the information current, accurate and complete enough for management decisions?')
-        integration=anchor_slider('Integration between systems / tools','integration',READY_ANCHORS,'Do the systems operate coherently without excessive duplication or manual re-entry?')
-    with right:
-        st.subheader('Physical Presence Need')
-        R=anchor_slider('How serious are the consequences of an incorrect or delayed decision?  (R — Risk / consequence)','R',R_ANCHORS,'Consider safety, quality, compliance, programme, commercial and irreversible-work consequences.')
-        V=anchor_slider('How necessary is direct observation of actual site conditions?  (V — Verification / site context)','V',V_ANCHORS,'Consider inspection, hold points, physical verification and conditions that are difficult to represent digitally.')
-        L=anchor_slider('How dependent is this activity on face-to-face leadership and human interaction?  (L — Leadership / relational requirement)','L',L_ANCHORS,'Consider trust, mentoring, difficult conversations, conflict resolution and interpersonal cues.')
-        st.markdown('### Governance & emerging technology'); ai_used=st.checkbox('AI / automated monitoring outputs are used in this assessment'); human_review=accountability=validation=True
-        if ai_used:
-            human_review=st.checkbox('Human review is retained before consequential action',value=True); accountability=st.checkbox('Responsibility for the final decision is clearly assigned',value=True); validation=st.checkbox('Source data and automated outputs are validated',value=True)
-    confirm=st.checkbox('I confirm that I have reviewed all HMAF factors and the selected scores represent the current project conditions.',value=False)
-    submitted=st.form_submit_button('Calculate Management Allocation',type='primary',use_container_width=True)
+
+# Widgets intentionally sit OUTSIDE st.form so captions and dependent guidance update live.
+# HMAF results are still hidden until the user confirms and clicks Calculate Management Allocation.
+c1,c2=st.columns(2)
+with c1:
+    assessment_name=st.text_input('Assessment name',placeholder='Example: Level 3 concrete pour — Tower A')
+    scope=st.radio('Assessment level',['Current management activity','Current project stage','Whole project — preliminary only'],help='Stage/activity assessment is preferred because the research indicates management requirements change with context.')
+    project_stage=st.selectbox('Current project stage',['Not specified','Pre-construction / design coordination','Mobilisation / site establishment','Structure','Envelope','Services / fit-out','Commissioning','Handover / close-out','Other'])
+with c2:
+    project_value=st.selectbox('Typical project value',['Not specified','<$5m','$5m–$50m','$50m–$250m','>$250m','Varies / not applicable'])
+    concurrent_projects=st.selectbox('How many projects are you currently managing or coordinating?',['Not specified','1','2–3','4–5','6–8','9+'])
+    activity=st.selectbox('Closest management activity',list(TASK_PRESENCE_EVIDENCE.keys()))
+if scope=='Whole project — preliminary only':
+    st.warning('Whole-project assessment selected. Treat the resulting HMOS as preliminary and repeat the assessment for important project stages and management activities.')
+
+st.header('2. Assess the HMAF factors')
+st.caption('Slider explanations update immediately. **No HMOS result is produced until you confirm and click Calculate Management Allocation.**')
+left,right=st.columns(2)
+with left:
+    st.subheader('Digital Suitability')
+    I=anchor_slider('How digitally manageable is this activity?  (I — Information suitability)','I',I_ANCHORS,'To what extent can the activity be accurately understood, reviewed and progressed using current digital information?')
+    C=anchor_slider('How strongly does workload require remote management reach?  (C — Concurrency / scalability)','C',C_ANCHORS,'How strongly do concurrent projects, geographic spread or multiple workstreams create a need for digital management reach?')
+    st.markdown('### Digital Environment Reliability (D)'); st.caption('D is calculated from the four digital-readiness conditions measured in the research.')
+    devices=anchor_slider('Suitable devices / access','devices',READY_ANCHORS,'Are suitable devices, access and permissions available?')
+    connectivity=anchor_slider('Site network / connectivity','connectivity',READY_ANCHORS,'Is connectivity dependable enough for the intended digital workflow?')
+    information_quality=anchor_slider('Quality and currency of project information','information_quality',READY_ANCHORS,'Is the information current, accurate and complete enough for management decisions?')
+    integration=anchor_slider('Integration between systems / tools','integration',READY_ANCHORS,'Do the systems operate coherently without excessive duplication or manual re-entry?')
+
+    # Live D diagnostic is safe to show before HMOS because it is an input-derived readiness diagnostic, not the final allocation result.
+    live_d=(devices+connectivity+information_quality+integration)/4
+    if live_d < 3:
+        st.warning(f'**Live Digital Environment Reliability: D = {live_d:.2f}/5** — below the adequate midpoint. Strengthen weak readiness conditions before relying more heavily on digital management.')
+    elif live_d >= 4:
+        st.success(f'**Live Digital Environment Reliability: D = {live_d:.2f}/5** — reliable digital environment.')
+    else:
+        st.info(f'**Live Digital Environment Reliability: D = {live_d:.2f}/5** — adequate / mixed digital environment.')
+
+with right:
+    st.subheader('Physical Presence Need')
+    R=anchor_slider('How serious are the consequences of an incorrect or delayed decision?  (R — Risk / consequence)','R',R_ANCHORS,'Consider safety, quality, compliance, programme, commercial and irreversible-work consequences.')
+    V=anchor_slider('How necessary is direct observation of actual site conditions?  (V — Verification / site context)','V',V_ANCHORS,'Consider inspection, hold points, physical verification and conditions that are difficult to represent digitally.')
+    L=anchor_slider('How dependent is this activity on face-to-face leadership and human interaction?  (L — Leadership / relational requirement)','L',L_ANCHORS,'Consider trust, mentoring, difficult conversations, conflict resolution and interpersonal cues.')
+    st.markdown('### Governance & emerging technology')
+    ai_used=st.checkbox('AI / automated monitoring outputs are used in this assessment')
+    human_review=accountability=validation=True
+    if ai_used:
+        human_review=st.checkbox('Human review is retained before consequential action',value=True)
+        accountability=st.checkbox('Responsibility for the final decision is clearly assigned',value=True)
+        validation=st.checkbox('Source data and automated outputs are validated',value=True)
+
+# Build the current input signature. If the user changes anything after a calculation,
+# the old result is removed so it cannot be mistaken for the current assessment.
+current_signature=(
+    assessment_name,scope,project_stage,project_value,concurrent_projects,activity,
+    I,C,devices,connectivity,information_quality,integration,R,V,L,
+    ai_used,human_review,accountability,validation
+)
+existing_record=st.session_state.get('hmaf_record')
+if existing_record and existing_record.get('input_signature') != current_signature:
+    st.session_state.pop('hmaf_record',None)
+    st.info('Assessment inputs have changed. Review the updated factors and click **Calculate Management Allocation** to produce a new HMOS result.')
+
+confirm=st.checkbox('I confirm that I have reviewed all HMAF factors and the selected scores represent the current project conditions.',value=False,key='confirm_assessment')
+submitted=st.button('Calculate Management Allocation',type='primary',use_container_width=True)
 
 if submitted:
     if not confirm:
-        st.warning('Please confirm that you have reviewed the assessment factors before calculating the HMOS.'); st.session_state.pop('hmaf_record',None)
+        st.warning('Please confirm that you have reviewed the assessment factors before calculating the HMOS.')
+        st.session_state.pop('hmaf_record',None)
     else:
         result=calculate_hmaf(I,C,devices,connectivity,information_quality,integration,R,V,L)
         inputs={'I':I,'C':C,'devices':devices,'connectivity':connectivity,'information_quality':information_quality,'integration':integration,'R':R,'V':V,'L':L}
         assessment={'assessment_name':assessment_name,'scope':scope,'project_stage':project_stage,'project_value':project_value,'concurrent_projects':concurrent_projects,'activity':activity}
-        benchmarks=automatic_benchmarks(project_value,concurrent_projects,activity); plan=management_plan(inputs,result,activity,ai_used,human_review,accountability,validation); assessment_ref=make_assessment_ref()
-        st.session_state['hmaf_record']={'result':result,'inputs':inputs,'assessment':assessment,'benchmarks':benchmarks,'plan':plan,'assessment_ref':assessment_ref,'ai_used':ai_used,'human_review':human_review,'accountability':accountability,'validation':validation}
+        benchmarks=automatic_benchmarks(project_value,concurrent_projects,activity)
+        plan=management_plan(inputs,result,activity,ai_used,human_review,accountability,validation)
+        assessment_ref=make_assessment_ref()
+        st.session_state['hmaf_record']={'result':result,'inputs':inputs,'assessment':assessment,'benchmarks':benchmarks,'plan':plan,'assessment_ref':assessment_ref,'ai_used':ai_used,'human_review':human_review,'accountability':accountability,'validation':validation,'input_signature':current_signature}
 
 record=st.session_state.get('hmaf_record')
 if record:
@@ -138,5 +176,5 @@ if record:
     st.download_button('Download HMAF Management Allocation Report (PDF)',data=pdf_bytes,file_name=f'{safe}_{assessment_ref}.pdf',mime='application/pdf',type='primary',use_container_width=True)
     csv_output=io.StringIO(); writer=csv.writer(csv_output); writer.writerow(['Assessment reference','Model version','Assessment name','Assessment level','Project stage','Project value','Concurrent projects','Activity','I','C','Devices','Connectivity','Information quality','Integration','D','R','V','L','DS','PPN','HMOS','Orientation']); writer.writerow([assessment_ref,MODEL_VERSION,assessment['assessment_name'],assessment['scope'],assessment['project_stage'],assessment['project_value'],assessment['concurrent_projects'],assessment['activity'],inputs['I'],inputs['C'],inputs['devices'],inputs['connectivity'],inputs['information_quality'],inputs['integration'],f'{result.digital_reliability:.3f}',inputs['R'],inputs['V'],inputs['L'],f'{result.digital_suitability:.3f}',f'{result.physical_presence_need:.3f}',f'{result.hmos:.3f}',result.orientation]); st.download_button('Download raw assessment data (CSV)',data=csv_output.getvalue(),file_name=f'{safe}_{assessment_ref}.csv',mime='text/csv',use_container_width=True)
     with st.expander('Research basis, model interpretation and limitations'):
-        st.markdown('''**Interpretation**  \nHMAF is intended to be recalculated by management activity or project stage. It does not translate HMOS into a fixed onsite-attendance percentage.\n\n**Equal weighting**  \nEqual weights remain intentional in Version 0.02. The exploratory regression coefficient for digital-system reliability is not inserted as an HMOS weight because that regression predicted perceived digital effectiveness rather than the final digital/physical allocation outcome.\n\n**PPN interpretation**  \nPPN is an operational allocation index. It is not claimed to be a validated psychometric scale combining safety, verification and relational leadership into one interchangeable construct.\n\n**Decision-support limitation**  \nHMAF does not replace WHS duties, legislation, statutory inspection requirements, contractual requirements, competent supervision or professional judgement.''')
+        st.markdown('''**Interpretation**  \nHMAF is intended to be recalculated by management activity or project stage. It does not translate HMOS into a fixed onsite-attendance percentage.\n\n**Equal weighting**  \nEqual weights remain intentional in Version 0.03. The exploratory regression coefficient for digital-system reliability is not inserted as an HMOS weight because that regression predicted perceived digital effectiveness rather than the final digital/physical allocation outcome.\n\n**PPN interpretation**  \nPPN is an operational allocation index. It is not claimed to be a validated psychometric scale combining safety, verification and relational leadership into one interchangeable construct.\n\n**Decision-support limitation**  \nHMAF does not replace WHS duties, legislation, statutory inspection requirements, contractual requirements, competent supervision or professional judgement.''')
     st.caption(f'{assessment_ref} • HMAF Version {MODEL_VERSION}')
