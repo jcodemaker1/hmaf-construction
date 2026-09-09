@@ -18,7 +18,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.block-container {padding-top: 2rem; padding-bottom: 3rem; max-width: 1450px;}
+.block-container {padding-top: 3.75rem; padding-bottom: 3rem; max-width: 1450px;}
 h1, h2, h3 {color:#18324A;}
 .hmaf-eyebrow {color:#147D73;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.8rem;}
 .hmaf-card {border:1px solid #E4E7EC;border-radius:12px;padding:16px 18px;background:#FFFFFF;margin-bottom:10px;}
@@ -102,6 +102,13 @@ def render_bullets(items):
         return
     md = "\n".join([f"- {item}" for item in clean])
     st.markdown(md)
+
+def benchmark_relationship(delta):
+    if abs(delta) < 0.05:
+        return "Broadly aligned with the study benchmark"
+    if delta > 0:
+        return f"{abs(delta):.2f} points more digitally oriented than the study benchmark"
+    return f"{abs(delta):.2f} points more physically oriented than the study benchmark"
 
 def reset_assessment():
     keys = [
@@ -398,15 +405,15 @@ if record:
         st.caption("Automatically selected from the project context. Benchmarks provide comparison only and do not alter the HMOS.")
         for b in benchmarks:
             delta = result.hmos - b["mean"]
+            relationship = benchmark_relationship(delta)
             st.markdown(
                 f"""
                 <div class="hmaf-card">
                 <b>{b['label']}</b><br>
                 <span style="color:#667085">Study mean</span> <b>{b['mean']:.2f}/5</b>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <span style="color:#667085">Hybrid category</span> <b>{b['hybrid']:.1f}%</b>
-                &nbsp;&nbsp;|&nbsp;&nbsp;
-                <span style="color:#667085">Difference</span> <b>{delta:+.2f}</b><br>
+                <span style="color:#667085">Hybrid category</span> <b>{b['hybrid']:.1f}%</b><br>
+                <span style="color:#147D73"><b>{relationship}</b></span><br>
                 <span class="small-note">{b['evidence']} Contextual evidence only; not a target.</span>
                 </div>
                 """,
@@ -476,8 +483,19 @@ if record:
 
     st.header("4. Download assessment record")
     pdf_bytes = build_pdf(
-        assessment, result, plan, benchmarks, evidence_lines,
-        assessment_ref, MODEL_VERSION
+        assessment,
+        result,
+        plan,
+        benchmarks,
+        evidence_lines,
+        assessment_ref,
+        MODEL_VERSION,
+        inputs,
+        record["ai_used"],
+        record["human_review"],
+        record["accountability"],
+        record["validation"],
+        sensitivity,
     )
     safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in (assessment["assessment_name"] or assessment_ref))
     st.download_button(
@@ -494,7 +512,8 @@ if record:
     writer.writerow([
         "Assessment reference", "Model version", "Assessment name", "Assessment level", "Project stage",
         "Project value", "Concurrent projects", "Activity", "I", "C", "Devices", "Connectivity",
-        "Information quality", "Integration", "D", "R", "V", "L", "DS", "PPN", "HMOS", "Orientation"
+        "Information quality", "Integration", "D", "R", "V", "L", "DS", "PPN", "HMOS", "Orientation",
+        "AI / automated monitoring used", "Human review", "Decision accountability", "Data/output validation"
     ])
     writer.writerow([
         assessment_ref, MODEL_VERSION, assessment["assessment_name"], assessment["scope"],
@@ -502,7 +521,11 @@ if record:
         assessment["activity"], inputs["I"], inputs["C"], inputs["devices"], inputs["connectivity"],
         inputs["information_quality"], inputs["integration"], f"{result.digital_reliability:.3f}",
         inputs["R"], inputs["V"], inputs["L"], f"{result.digital_suitability:.3f}",
-        f"{result.physical_presence_need:.3f}", f"{result.hmos:.3f}", result.orientation
+        f"{result.physical_presence_need:.3f}", f"{result.hmos:.3f}", result.orientation,
+        record["ai_used"],
+        record["human_review"] if record["ai_used"] else "N/A",
+        record["accountability"] if record["ai_used"] else "N/A",
+        record["validation"] if record["ai_used"] else "N/A"
     ])
     st.download_button(
         "Download raw assessment data (CSV)",
@@ -521,7 +544,7 @@ HMAF is intended to be recalculated by management activity or project stage. It 
 
 **Equal weighting**
 
-Equal weights remain intentional in Version 0.04. The research supports the inclusion and expected direction of the six HMAF factors, but it does not estimate defensible coefficients for all six factors in the final allocation equation. The exploratory regression coefficient for digital-system reliability is not inserted as an HMOS weight because that regression predicted perceived digital effectiveness rather than the final digital/physical allocation outcome.
+Equal weights remain intentional in Version 0.05. The research supports the inclusion and expected direction of the six HMAF factors, but it does not estimate defensible coefficients for all six factors in the final allocation equation. The exploratory regression coefficient for digital-system reliability is not inserted as an HMOS weight because that regression predicted perceived digital effectiveness rather than the final digital/physical allocation outcome.
 
 **PPN interpretation**
 

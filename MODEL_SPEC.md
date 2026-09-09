@@ -1,4 +1,4 @@
-# HMAF / HMOS Model Specification — Version 0.02
+# HMAF / HMOS Model Specification — Version 0.05
 
 ## Purpose
 Operationalise practitioner-grounded findings concerning allocation of digital and physical construction-management effort.
@@ -28,3 +28,11 @@ Task-specific physical-presence evidence, high-consequence verification, low dig
 
 ## Stage responsiveness
 HMOS should be recalculated when stage, task, risk, workload or digital readiness materially changes. It must not be converted directly to one fixed onsite-attendance percentage.
+
+
+## Version 0.05 reporting and explainability
+Version 0.05 does not alter the HMOS mathematics. It introduces a deliberate two-page assessment report:
+- Page 1: assessment context, DS, PPN, HMOS, allocation guidance, management allocation plan and research benchmarks.
+- Page 2: decision drivers, digital-environment reliability, AI/automated-monitoring governance, empirical evidence, sensitivity analysis and limitations.
+
+Research benchmark differences are expressed directionally in management language rather than as an unexplained positive/negative number.

@@ -42,3 +42,15 @@ python -m unittest discover -s tests -v
 - PDF footer identifies developer, Deakin University and the research paper.
 - Developer: Mr. Jarrad Kyne
 - Research paper: The effectiveness of digital project management tools compared to physical site presence in construction
+
+
+## Version 0.05
+- No changes to the HMOS equations or category thresholds.
+- Fixed top-page spacing so the research-derived decision-support label is not clipped.
+- Benchmark differences are now explained as "more physically oriented" or "more digitally oriented".
+- PDF is intentionally structured as a two-page management report.
+- Page 2 adds decision-driver analysis.
+- Page 2 adds Digital Environment Reliability (D) and all four readiness components.
+- Page 2 adds AI / automated-monitoring governance status.
+- Page 2 adds research evidence and sensitivity analysis.
+- Raw CSV output now records AI/governance fields.
