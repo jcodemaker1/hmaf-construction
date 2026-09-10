@@ -1,56 +1,22 @@
-# HMAF Version 0.03
-Hybrid Management Allocation Framework (HMAF) / Hybrid Management Orientation Score (HMOS).
+# Hybrid Management Allocation Framework (HMAF) — Version 0.06
 
-## Version 0.03 changes
-- No result before deliberate submission.
-- Automatic research benchmarks from factual context inputs.
-- Concurrent-project workload added.
-- Industry-facing slider questions while academic variable codes remain visible.
-- Digital readiness diagnostic.
-- Physical-presence and AI governance safeguards.
-- Management Allocation Plan.
-- Evidence behind the recommendation.
-- One-step sensitivity analysis.
-- PDF assessment report and raw CSV.
-- Assessment reference and model version.
-- Automated calculation and threshold tests.
+Research-derived construction management decision-support prototype.
 
-## Core formula
-D = (Devices + Connectivity + Information Quality + Integration) / 4
-DS = (I + C + D) / 3
-PPN = (R + V + L) / 3
-HMOS = 3 + (DS - PPN) / 2
+Developed by Mr. Jarrad Kyne, Deakin University.
 
-## Run tests
-python -m unittest discover -s tests -v
+Research paper: “The effectiveness of digital project management tools compared to physical site presence in construction”.
 
+## Version 0.06 changes
+- Concurrent project count now directly changes HMOS through C.
+- Directly matched survey situations calibrate the factor-based HMOS.
+- Management activity can affect the final score through task-specific physical-presence safeguards.
+- A high-risk/critical-stage control provides a defensible stage effect without inventing separate weights for named construction stages.
+- Balanced Hybrid narrowed to 2.85–3.15.
+- Calculation dropdown removed.
+- Tooltips rewritten to explain exactly what each slider measures and how it influences the model.
+- Previous research-benchmark section replaced with plain-language evidence and a transparent context-calibration breakdown.
+- More blue survey-evidence messages appear at the output.
+- PDF and CSV record the new calibration inputs and final calculation.
+- Automated tests cover project-count effects, context calibration, revised thresholds and task safeguards.
 
-## Version 0.04 updates
-- Removed stray list/null output artifacts from the app display.
-- Updated PDF output to a green/teal palette.
-- Added developer / research-paper footer line to PDF reports.
-- Added metadata.py for easy editing of developer name and research paper title.
-
-
-## Version 0.04 final refinements
-- Renamed "Closest management activity" to "Management activity being assessed".
-- Research benchmarks now use a compact card layout.
-- Added a Reset assessment control.
-- Tightened allocation-guidance wording.
-- PDF hierarchy refined with a dedicated allocation-guidance panel.
-- PDF uses a green/teal visual system throughout.
-- PDF footer identifies developer, Deakin University and the research paper.
-- Developer: Mr. Jarrad Kyne
-- Research paper: The effectiveness of digital project management tools compared to physical site presence in construction
-
-
-## Version 0.05
-- No changes to the HMOS equations or category thresholds.
-- Fixed top-page spacing so the research-derived decision-support label is not clipped.
-- Benchmark differences are now explained as "more physically oriented" or "more digitally oriented".
-- PDF is intentionally structured as a two-page management report.
-- Page 2 adds decision-driver analysis.
-- Page 2 adds Digital Environment Reliability (D) and all four readiness components.
-- Page 2 adds AI / automated-monitoring governance status.
-- Page 2 adds research evidence and sensitivity analysis.
-- Raw CSV output now records AI/governance fields.
+See `MODEL_SPEC.md` for the complete model and `V0_06_TUTOR_REVIEW_RESPONSE.md` for the tutor-feedback response.
